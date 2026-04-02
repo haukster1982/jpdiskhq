@@ -1,1 +1,256 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Discgolf Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surf:#1a1d27;--surf2:#22263a;--bord:#2e3348;--acc:#e8541a;--text:#eef0f8;--dim:#6b7280;--grn:#22c55e;--yel:#facc15;--red:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh}
+header{background:var(--surf);border-bottom:3px solid var(--acc);padding:14px 16px;position:sticky;top:0;z-index:100}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:var(--acc);letter-spacing:1px}
+.logo span{color:var(--text)}
+.logo-sub{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase}
+.tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--bord);overflow-x:auto}
+.tab{flex:1;min-width:80px;padding:12px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;text-transform:uppercase}
+.tab.aktiv{color:var(--acc);border-bottom-color:var(--acc)}
+.side{display:none;padding:16px}.side.aktiv{display:block}
+.sokk{background:var(--surf);border-radius:12px;padding:14px;margin-bottom:14px}
+.sokk-tittel{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.rad{display:flex;gap:8px;margin-bottom:8px}
+input{flex:1;background:var(--surf2);border:1.5px solid var(--bord);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;outline:none}
+input:focus{border-color:var(--acc)}
+input::placeholder{color:var(--dim)}
+button{background:var(--acc);border:none;border-radius:8px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap}
+button:active{background:#ff7a42}
+.btn-sec{background:var(--surf2);border:1.5px solid var(--bord);color:var(--text)}
+.info-kort{background:var(--surf);border-radius:12px;padding:14px 16px;margin-bottom:12px;border-left:4px solid var(--acc);display:none}
+.info-kort.vis{display:block}
+.ik-navn{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;margin-bottom:3px}
+.ik-meta{font-size:13px;color:var(--dim);line-height:1.6}
+.live-bar{display:none;align-items:center;gap:8px;margin-bottom:12px;background:rgba(232,84,26,.1);border:1px solid rgba(232,84,26,.3);border-radius:8px;padding:9px 12px}
+.live-bar.vis{display:flex}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);animation:puls 1.2s infinite}
+@keyframes puls{0%,100%{opacity:1}50%{opacity:.3}}
+.live-txt{font-size:13px;color:var(--acc);flex:1}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid var(--bord);display:none}
+.tbl-wrap.vis{display:block}
+table{width:max-content;min-width:100%;border-collapse:collapse;font-family:'Barlow Condensed',sans-serif;font-size:14px}
+thead tr{background:var(--surf2)}
+th{padding:8px 5px;text-align:center;color:var(--dim);font-size:12px;font-weight:700;border-bottom:1px solid var(--bord);white-space:nowrap}
+th.nc,td.nc{text-align:left;padding-left:10px;position:sticky;left:0;z-index:2;min-width:110px;max-width:140px}
+thead th.nc{background:var(--surf2)}
+td{padding:7px 5px;text-align:center;border-bottom:1px solid var(--bord);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.nc{background:var(--bg)}
+tbody tr:nth-child(even) td.nc{background:#12141c}
+.s-b2{color:#16a34a;font-weight:700}.s-b1{color:var(--grn);font-weight:600}.s-par{color:var(--dim)}
+.s-bo{color:var(--yel);font-weight:600}.s-db{color:var(--red);font-weight:700}.s-ob{color:var(--red);font-weight:700}
+.d-neg{color:var(--grn);font-weight:700}.d-pos{color:var(--yel);font-weight:700}.d-e{color:var(--dim)}
+.par-row td{color:var(--dim);font-size:12px;background:var(--surf2)!important}
+.kort-liste{display:flex;flex-direction:column;gap:10px}
+.kort{background:var(--surf);border-radius:10px;padding:14px 16px;border:1px solid var(--bord);text-decoration:none;color:inherit;display:block}
+.kort:active{border-color:var(--acc)}
+.kort-navn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px}
+.kort-meta{font-size:12px;color:var(--dim);line-height:1.6}
+.badge{display:inline-block;background:rgba(232,84,26,.15);color:var(--acc);border:1px solid rgba(232,84,26,.3);border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;margin-right:5px}
+.ldr{text-align:center;padding:30px 20px;color:var(--dim);font-size:14px;display:none}
+.ldr.vis{display:block}
+.spinner{width:32px;height:32px;border:3px solid var(--bord);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.feil{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:12px 14px;color:var(--red);font-size:13px;display:none;margin-bottom:12px}
+.feil.vis{display:block}
+.opd{font-size:12px;color:var(--dim);text-align:right;margin-top:6px;display:none}
+.opd.vis{display:block}
+.tom{text-align:center;padding:30px;color:var(--dim);font-size:14px}
+.live-knapper{display:none;gap:8px;margin-top:8px}
+.live-knapper.vis{display:flex}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Disc<span>Golf</span> Hub</div>
+  <div class="logo-sub">Norge</div>
+</header>
+<div class="tabs">
+  <div class="tab aktiv" onclick="byttTab('metrix',this)">🏆 Metrix</div>
+  <div class="tab" onclick="byttTab('scene',this)">📅 Turneringer</div>
+</div>
+
+<div id="side-metrix" class="side aktiv">
+  <div class="sokk">
+    <div class="sokk-tittel">Hent konkurranse</div>
+    <div class="rad">
+      <input type="number" id="m-id" placeholder="Konkurranse-ID..." inputmode="numeric">
+      <button onclick="hentMetrix()">Hent</button>
+    </div>
+    <div class="live-knapper" id="live-knapper">
+      <button class="btn-sec" id="live-btn" onclick="toggleLive()" style="flex:1">⟳ Live</button>
+      <button class="btn-sec" onclick="hentMetrix()" style="padding:10px 14px">↺</button>
+    </div>
+  </div>
+  <div class="feil" id="m-feil"></div>
+  <div class="ldr" id="m-ldr"><div class="spinner"></div>Henter resultater...</div>
+  <div class="info-kort" id="m-info">
+    <div class="ik-navn" id="m-navn"></div>
+    <div class="ik-meta" id="m-meta"></div>
+  </div>
+  <div class="live-bar" id="live-bar">
+    <div class="live-dot"></div>
+    <div class="live-txt">Live – oppdaterer hvert 30. sek</div>
+    <button class="btn-sec" onclick="toggleLive()" style="padding:5px 10px;font-size:13px">Stopp</button>
+  </div>
+  <div class="tbl-wrap" id="m-tbl-wrap"><table id="m-tbl"></table></div>
+  <div class="opd" id="m-opd"></div>
+</div>
+
+<div id="side-scene" class="side">
+  <div class="ldr" id="s-ldr"><div class="spinner"></div>Henter turneringer...</div>
+  <div class="feil" id="s-feil"></div>
+  <div id="s-liste" class="kort-liste"></div>
+</div>
+
+<script>
+let liveTimer=null,liveAktiv=false,gjeldId=null;
+function vis(id){document.getElementById(id).classList.add('vis')}
+function skj(id){document.getElementById(id).classList.remove('vis')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+
+function byttTab(navn,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('aktiv'));
+  document.querySelectorAll('.side').forEach(s=>s.classList.remove('aktiv'));
+  el.classList.add('aktiv');
+  document.getElementById('side-'+navn).classList.add('aktiv');
+  if(navn==='scene'&&document.getElementById('s-liste').children.length===0) hentScene();
+}
+
+async function apiFetch(url){
+  const proxies=[
+    'https://corsproxy.io/?'+encodeURIComponent(url),
+    'https://api.allorigins.win/get?url='+encodeURIComponent(url)
+  ];
+  for(const p of proxies){
+    try{
+      const r=await fetch(p);
+      if(!r.ok) continue;
+      const j=await r.json();
+      const raw=j.contents!==undefined?j.contents:JSON.stringify(j);
+      return JSON.parse(raw);
+    }catch(e){continue}
+  }
+  throw new Error('Kunne ikke hente data');
+}
+
+async function hentMetrix(){
+  const id=document.getElementById('m-id').value.trim();
+  if(!id) return;
+  gjeldId=id;
+  skj('m-feil');skj('m-info');skj('m-tbl-wrap');skj('m-opd');skj('live-knapper');
+  vis('m-ldr');
+  try{
+    const data=await apiFetch('https://discgolfmetrix.com/api.php?content=result&id='+id);
+    skj('m-ldr');
+    if(!data.Competition||!data.Competition.ID){visFeil('m-feil','Fant ingen konkurranse med ID '+id);return}
+    byggTabell(data.Competition);
+  }catch(e){skj('m-ldr');visFeil('m-feil','Kunne ikke hente data. Prøv igjen.')}
+}
+
+function byggTabell(c){
+  document.getElementById('m-navn').textContent=c.Name||'Ukjent';
+  const ant=(c.Results||[]).length;
+  document.getElementById('m-meta').innerHTML=`${c.Date||''} &nbsp;·&nbsp; ${c.CourseName||''} &nbsp;·&nbsp; <strong>${ant} spillere</strong>`;
+  vis('m-info');
+  const tracks=c.Tracks||[];
+  const results=[...(c.Results||[])].sort((a,b)=>(a.OrderNumber||99)-(b.OrderNumber||99));
+  const t=document.getElementById('m-tbl');
+  t.innerHTML='';
+  const thead=t.createTHead();
+  const hr=thead.insertRow();
+  const mkTh=(txt,cls)=>{const th=document.createElement('th');th.innerHTML=txt;if(cls)th.className=cls;return th};
+  hr.appendChild(mkTh('#'));hr.appendChild(mkTh('Spiller','nc'));
+  tracks.forEach(tr=>hr.appendChild(mkTh(tr.Number)));
+  hr.appendChild(mkTh('Sum'));hr.appendChild(mkTh('+/-'));
+  const pr=thead.insertRow();pr.className='par-row';
+  pr.appendChild(Object.assign(document.createElement('td'),{textContent:''}));
+  const ptd=document.createElement('td');ptd.className='nc';ptd.textContent='Par';pr.appendChild(ptd);
+  let tp=0;
+  tracks.forEach(tr=>{tp+=parseInt(tr.Par)||0;const td=document.createElement('td');td.textContent=tr.Par;pr.appendChild(td)});
+  const tptd=document.createElement('td');tptd.textContent=tp;pr.appendChild(tptd);
+  pr.appendChild(document.createElement('td'));
+  const tbody=t.createTBody();
+  results.forEach(r=>{
+    const row=tbody.insertRow();
+    const c1=row.insertCell();c1.textContent=r.OrderNumber||'';c1.style.cssText='color:var(--dim);font-size:12px';
+    const c2=row.insertCell();c2.className='nc';
+    c2.innerHTML=`<div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px">${esc(r.Name)}</div>${r.ClassName?`<div style="font-size:11px;color:var(--dim)">${esc(r.ClassName)}</div>`:''}`;
+    (r.PlayerResults||[]).forEach(h=>{
+      const td=row.insertCell();
+      if(h.Result===null||h.Result===undefined||h.Result===''){td.className='s-par';td.textContent='·';return}
+      const ob=parseInt(h.OB||0)>0;
+      const hd=(h.Diff!==null&&h.Diff!==undefined)?parseInt(h.Diff):0;
+      td.className=ob?'s-ob':hd<=-2?'s-b2':hd===-1?'s-b1':hd===0?'s-par':hd===1?'s-bo':'s-db';
+      td.textContent=h.Result+(ob?'*':'');
+    });
+    const sc=row.insertCell();sc.style.fontWeight='700';sc.textContent=r.Sum??'';
+    const dc=row.insertCell();
+    const d=r.Diff;
+    if(r.DNF){dc.className='d-e';dc.textContent='DNF'}
+    else if(d===null||d===undefined){dc.className='d-e';dc.textContent='–'}
+    else{const di=parseInt(d);dc.className=di<0?'d-neg':di===0?'d-e':'d-pos';dc.textContent=di===0?'E':(di>0?'+'+di:di)}
+  });
+  vis('m-tbl-wrap');vis('live-knapper');
+  const naa=new Date().toLocaleTimeString('no-NO',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('m-opd').textContent='Oppdatert: '+naa;
+  vis('m-opd');
+}
+
+function toggleLive(){
+  const btn=document.getElementById('live-btn');
+  const bar=document.getElementById('live-bar');
+  if(liveAktiv){clearInterval(liveTimer);liveTimer=null;liveAktiv=false;btn.textContent='⟳ Live';bar.classList.remove('vis')}
+  else{liveAktiv=true;btn.textContent='⏹ Stopp live';bar.classList.add('vis');liveTimer=setInterval(()=>{if(gjeldId)hentMetrix()},30000)}
+}
+
+async function hentScene(){
+  vis('s-ldr');skj('s-feil');
+  try{
+    const data=await apiFetch('https://discgolfmetrix.com/api.php?content=courses_list&country_code=NO');
+    skj('s-ldr');
+    // Vis norske turneringer fra discgolfscene direkte som lenker
+    const liste=document.getElementById('s-liste');
+    liste.innerHTML=`
+      <a class="kort" href="https://www.discgolfscene.com/tournaments/Norway" target="_blank" rel="noopener">
+        <div class="kort-navn">Alle turneringer i Norge</div>
+        <div class="kort-meta">Se fullstendig liste på Discgolfscene.com →</div>
+      </a>
+      <a class="kort" href="https://www.pdga.com/tour/search?Country=NO" target="_blank" rel="noopener">
+        <div class="kort-navn">PDGA-turneringer i Norge</div>
+        <div class="kort-meta"><span class="badge">PDGA</span>Søk på pdga.com →</div>
+      </a>
+      <a class="kort" href="https://www.discgolfscene.com/tournaments/Norway?tier=C" target="_blank" rel="noopener">
+        <div class="kort-navn">C-tier turneringer</div>
+        <div class="kort-meta"><span class="badge">C-tier</span>Filtrer på discgolfscene.com →</div>
+      </a>
+      <a class="kort" href="https://www.discgolfscene.com/tournaments/Norway?tier=B" target="_blank" rel="noopener">
+        <div class="kort-navn">B-tier og opp</div>
+        <div class="kort-meta"><span class="badge">B-tier</span>Filtrer på discgolfscene.com →</div>
+      </a>
+    `;
+  }catch(e){
+    skj('s-ldr');
+    document.getElementById('s-liste').innerHTML=`
+      <a class="kort" href="https://www.discgolfscene.com/tournaments/Norway" target="_blank" rel="noopener">
+        <div class="kort-navn">Turneringer i Norge</div>
+        <div class="kort-meta">Åpne discgolfscene.com →</div>
+      </a>`;
+  }
+}
+
+function visFeil(id,msg){const el=document.getElementById(id);el.textContent=msg;el.classList.add('vis')}
+document.getElementById('m-id').addEventListener('keydown',e=>{if(e.key==='Enter')hentMetrix()});
+</script>
+</body>
+</html>
 

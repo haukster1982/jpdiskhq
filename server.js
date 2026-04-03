@@ -17,46 +17,52 @@ function fetchJson(url) {
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
         try { resolve(JSON.parse(data)); }
-        catch (e) { reject(new Error('JSON-feil: ' + data.slice(0,100))); }
+        catch (e) { reject(new Error('JSON-feil')); }
       });
     }).on('error', reject);
   });
 }
 
-// Hent resultater for en konkurranse
-app.get('/api/metrix/:id', async (req, res) => {
-  try {
-    const data = await fetchJson(`https://discgolfmetrix.com/api.php?content=result&id=${req.params.id}`);
-    res.json(data);
-  } catch (e) { res.status(500).json({ error: e.message }); }
-});
-
-// Hent alle norske baner
+// Hent ALLE norske baner ved å søke på hvert bokstav
 app.get('/api/baner', async (req, res) => {
   try {
-    const data = await fetchJson('https://discgolfmetrix.com/api.php?content=courses_list&country_code=NO');
-    const baner = Array.isArray(data) ? data : (data.Courses || []);
-    console.log('Totalt baner:', baner.length);
-    if (baner.length > 0) console.log('Forste bane:', JSON.stringify(baner[0]));
-    else console.log('Ingen baner. Data:', JSON.stringify(data).slice(0,300));
-    res.json(data);
+    const bokstaver = 'abcdefghijklmnopqrstuvwxyzæøå';
+    const alleIds = new Set();
+    const alleBaner = [];
+
+    await Promise.all(bokstaver.split('').map(async (b) => {
+      try {
+        const data = await fetchJson(
+          `https://discgolfmetrix.com/api.php?content=courses_list&country_code=NO&name=${b}`
+        );
+        const baner = Array.isArray(data) ? data : (data.Courses || []);
+        baner.forEach(bane => {
+          if (!alleIds.has(bane.ID)) {
+            alleIds.add(bane.ID);
+            alleBaner.push(bane);
+          }
+        });
+      } catch(e) {}
+    }));
+
+    console.log(`Totalt ${alleBaner.length} baner hentet`);
+    res.json(alleBaner);
   } catch (e) {
-    console.log('Feil:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// Debug endpoint
+// Debug
 app.get('/api/debug', async (req, res) => {
   try {
-    const data = await fetchJson('https://discgolfmetrix.com/api.php?content=courses_list&country_code=NO');
+    const data = await fetchJson('https://discgolfmetrix.com/api.php?content=courses_list&country_code=NO&name=k');
     const baner = Array.isArray(data) ? data : (data.Courses || []);
-    res.json({ antall: baner.length, forste3: baner.slice(0, 3) });
+    res.json({ antall_med_k: baner.length, forste3: baner.slice(0, 3) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Hent konkurranser for en bane
-app.get('/api/bane/:id', async (req, res) => {
+// Hent resultater for en konkurranse
+app.get('/api/metrix/:id', async (req, res) => {
   try {
     const data = await fetchJson(`https://discgolfmetrix.com/api.php?content=result&id=${req.params.id}`);
     res.json(data);

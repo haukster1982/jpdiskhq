@@ -57,7 +57,6 @@ tbody tr:nth-child(even) td.nc{background:#12141c}
 .kort-meta{font-size:12px;color:var(--dim);line-height:1.8}
 .badge{display:inline-block;background:rgba(232,84,26,.15);color:var(--acc);border:1px solid rgba(232,84,26,.3);border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;margin-right:4px}
 .badge.blu{background:rgba(59,130,246,.12);color:#60a5fa;border-color:rgba(59,130,246,.3)}
-.badge.grn{background:rgba(34,197,94,.12);color:var(--grn);border-color:rgba(34,197,94,.3)}
 .ldr{text-align:center;padding:30px 20px;color:var(--dim);font-size:14px;display:none}
 .ldr.vis{display:block}
 .spinner{width:32px;height:32px;border:3px solid var(--bord);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
@@ -68,15 +67,16 @@ tbody tr:nth-child(even) td.nc{background:#12141c}
 .opd.vis{display:block}
 .live-knapper{display:none;gap:8px;margin-top:8px}
 .live-knapper.vis{display:flex}
-.fylke-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:4px}
-.fylke-kort{background:var(--surf);border:1px solid var(--bord);border-radius:10px;padding:14px;cursor:pointer;text-decoration:none;color:inherit;display:block}
-.fylke-kort:active{border-color:var(--acc)}
-.fylke-navn{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:17px;margin-bottom:6px}
-.fylke-lenker{display:flex;flex-direction:column;gap:4px}
-.fl{font-size:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-decoration:none;display:block;padding:4px 8px;border-radius:6px}
-.fl-m{background:rgba(232,84,26,.15);color:var(--acc)}
-.fl-s{background:rgba(59,130,246,.12);color:#60a5fa}
-.fl-u{background:rgba(34,197,94,.12);color:var(--grn)}
+.fylke-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.chip{background:var(--surf);border:1px solid var(--bord);border-radius:8px;padding:10px 6px;font-size:12px;color:var(--dim);cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;text-align:center}
+.chip:active,.chip.aktiv{background:var(--acc);border-color:var(--acc);color:#fff}
+.antall{font-size:12px;color:var(--dim);margin-bottom:10px;font-family:'Barlow Condensed',sans-serif}
+.komp-kort{background:var(--surf);border-radius:10px;padding:12px 14px;border:1px solid var(--bord);margin-bottom:8px;text-decoration:none;color:inherit;display:block}
+.komp-kort:active{border-color:var(--acc)}
+.komp-navn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;margin-bottom:3px}
+.komp-bane{font-size:12px;color:var(--dim);margin-bottom:2px}
+.komp-dato{font-size:12px;color:var(--acc);font-weight:700}
+.komp-klasser{font-size:11px;color:var(--dim);margin-top:3px}
 </style>
 </head>
 <body>
@@ -118,109 +118,28 @@ tbody tr:nth-child(even) td.nc{background:#12141c}
   <div class="opd" id="m-opd"></div>
 </div>
 
-<!-- KONKURRANSER PER FYLKE -->
+<!-- KONKURRANSER -->
 <div id="side-komp" class="side">
   <div class="sokk">
-    <div class="sokk-tittel">Velg fylke – se ukesgolfer og konkurranser</div>
+    <div class="sokk-tittel">Velg fylke</div>
+    <div class="fylke-grid" id="k-grid">
+      <div class="chip" onclick="hentKomp('Rogaland',this)">Rogaland</div>
+      <div class="chip" onclick="hentKomp('Vestland',this)">Vestland</div>
+      <div class="chip" onclick="hentKomp('Oslo',this)">Oslo</div>
+      <div class="chip" onclick="hentKomp('Trøndelag',this)">Trøndelag</div>
+      <div class="chip" onclick="hentKomp('Agder',this)">Agder</div>
+      <div class="chip" onclick="hentKomp('Innlandet',this)">Innlandet</div>
+      <div class="chip" onclick="hentKomp('Vestfold',this)">Vestfold</div>
+      <div class="chip" onclick="hentKomp('Møre og Romsdal',this)">Møre og R.</div>
+      <div class="chip" onclick="hentKomp('Viken',this)">Viken</div>
+      <div class="chip" onclick="hentKomp('Nordland',this)">Nordland</div>
+      <div class="chip" onclick="hentKomp('Troms',this)">Troms</div>
+      <div class="chip" onclick="hentKomp('Finnmark',this)">Finnmark</div>
+    </div>
   </div>
-  <div class="fylke-grid">
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Rogaland&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Rogaland</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Vestland&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Vestland</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Oslo&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Oslo</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Tr%C3%B8ndelag&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Trøndelag</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Agder&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Agder</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Innlandet&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Innlandet</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Vestfold&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Vestfold</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=M%C3%B8re&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Møre og Romsdal</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Viken&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Viken</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Nordland&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Nordland</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Troms&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Troms</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-    <a class="fylke-kort" href="https://discgolfmetrix.com/?u=competitions_list&country_code=NO&area=Finnmark&type=A&default_period=6" target="_blank" rel="noopener">
-      <div class="fylke-navn">📍 Finnmark</div>
-      <div class="fylke-lenker">
-        <span class="fl fl-m">Metrix konkurranser →</span>
-        <span class="fl fl-s">Discgolfscene →</span>
-        <span class="fl fl-u">UDisc →</span>
-      </div>
-    </a>
-  </div>
+  <div class="feil" id="k-feil"></div>
+  <div class="ldr" id="k-ldr"><div class="spinner"></div>Henter konkurranser...</div>
+  <div id="k-res"></div>
 </div>
 
 <!-- TURNERINGER -->
@@ -263,6 +182,40 @@ function byttTab(navn,el){
   document.getElementById('side-'+navn).classList.add('aktiv');
 }
 
+// ── KONKURRANSER ────────────────────────────────────────────────────────────
+async function hentKomp(fylke, el){
+  document.querySelectorAll('#k-grid .chip').forEach(c=>c.classList.remove('aktiv'));
+  el.classList.add('aktiv');
+  skj('k-feil');
+  document.getElementById('k-res').innerHTML='';
+  vis('k-ldr');
+  try{
+    const r = await fetch('/api/konkurranser/'+encodeURIComponent(fylke));
+    const data = await r.json();
+    skj('k-ldr');
+    const liste = data.konkurranser||[];
+    if(!liste.length){
+      document.getElementById('k-res').innerHTML=`<div style="text-align:center;padding:30px;color:var(--dim)">Ingen konkurranser funnet i ${esc(fylke)}</div>`;
+      return;
+    }
+    document.getElementById('k-res').innerHTML=`
+      <div class="antall">${liste.length} konkurranser i ${esc(fylke)}</div>
+      ${liste.map(k=>`
+        <a class="komp-kort" href="https://discgolfmetrix.com/${k.id}" target="_blank" rel="noopener">
+          <div class="komp-navn">${esc(k.navn)}</div>
+          <div class="komp-bane">📍 ${esc(k.bane||'')}</div>
+          <div class="komp-dato">🗓 ${esc(k.dato)}</div>
+          ${k.klasser?`<div class="komp-klasser">${esc(k.klasser)}</div>`:''}
+        </a>
+      `).join('')}`;
+  }catch(e){
+    skj('k-ldr');
+    document.getElementById('k-feil').textContent='Kunne ikke hente konkurranser.';
+    vis('k-feil');
+  }
+}
+
+// ── METRIX RESULTATER ───────────────────────────────────────────────────────
 async function hentMetrix(){
   const id=document.getElementById('m-id').value.trim();
   if(!id) return;

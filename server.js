@@ -17,7 +17,7 @@ function fetchJson(url) {
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
         try { resolve(JSON.parse(data)); }
-        catch (e) { reject(new Error('JSON-feil')); }
+        catch (e) { reject(new Error('JSON-feil: ' + data.slice(0,100))); }
       });
     }).on('error', reject);
   });
@@ -35,7 +35,23 @@ app.get('/api/metrix/:id', async (req, res) => {
 app.get('/api/baner', async (req, res) => {
   try {
     const data = await fetchJson('https://discgolfmetrix.com/api.php?content=courses_list&country_code=NO');
+    const baner = Array.isArray(data) ? data : (data.Courses || []);
+    console.log('Totalt baner:', baner.length);
+    if (baner.length > 0) console.log('Forste bane:', JSON.stringify(baner[0]));
+    else console.log('Ingen baner. Data:', JSON.stringify(data).slice(0,300));
     res.json(data);
+  } catch (e) {
+    console.log('Feil:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Debug endpoint
+app.get('/api/debug', async (req, res) => {
+  try {
+    const data = await fetchJson('https://discgolfmetrix.com/api.php?content=courses_list&country_code=NO');
+    const baner = Array.isArray(data) ? data : (data.Courses || []);
+    res.json({ antall: baner.length, forste3: baner.slice(0, 3) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -47,5 +63,4 @@ app.get('/api/bane/:id', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-app.listen(PORT, () => console.log(`JP Disk HQ kjører på port ${PORT}`));
-
+app.listen(PORT, () => console.log(`JP Disk HQ kjorer pa port ${PORT}`));

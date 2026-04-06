@@ -20,7 +20,7 @@ header{background:var(--surf);border-bottom:3px solid var(--acc);padding:14px 16
 .logo span{color:var(--text)}
 .logo-sub{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase}
 .tabs{display:flex;background:var(--surf);border-bottom:1px solid var(--bord);overflow-x:auto}
-.tab{flex:1;min-width:70px;padding:12px 4px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;text-transform:uppercase}
+.tab{flex:1;min-width:60px;padding:12px 4px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--dim);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;text-transform:uppercase}
 .tab.aktiv{color:var(--acc);border-bottom-color:var(--acc)}
 .side{display:none;padding:16px}.side.aktiv{display:block}
 .sokk{background:var(--surf);border-radius:12px;padding:14px;margin-bottom:14px}
@@ -32,6 +32,7 @@ input::placeholder{color:var(--dim)}
 button{background:var(--acc);border:none;border-radius:8px;padding:10px 18px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;cursor:pointer;white-space:nowrap}
 button:active{background:#ff7a42}
 .btn-sec{background:var(--surf2);border:1.5px solid var(--bord);color:var(--text)}
+.btn-danger{background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:var(--red)}
 .info-kort{background:var(--surf);border-radius:12px;padding:14px 16px;margin-bottom:12px;border-left:4px solid var(--acc);display:none}
 .info-kort.vis{display:block}
 .ik-navn{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;margin-bottom:3px}
@@ -83,6 +84,13 @@ tbody tr:nth-child(even) td.nc{background:#12141c}
 .komp-bane{font-size:12px;color:var(--dim);margin-bottom:2px}
 .komp-dato{font-size:12px;color:var(--acc);font-weight:700}
 .komp-klasser{font-size:11px;color:var(--dim);margin-top:3px}
+.fav-kort{background:var(--surf);border-radius:10px;padding:12px 14px;border:1px solid var(--bord);margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.fav-info{flex:1;cursor:pointer}
+.fav-navn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px}
+.fav-meta{font-size:12px;color:var(--dim)}
+.fav-slett{background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.fav-slett:active{color:var(--red)}
+.tom{text-align:center;padding:30px;color:var(--dim);font-size:14px;line-height:1.8}
 </style>
 </head>
 <body>
@@ -91,13 +99,31 @@ tbody tr:nth-child(even) td.nc{background:#12141c}
   <div class="logo-sub">Discgolf Norge</div>
 </header>
 <div class="tabs">
-  <div class="tab aktiv" onclick="byttTab('metrix',this)">🏆 Resultater</div>
+  <div class="tab aktiv" onclick="byttTab('fav',this)">⭐ Favoritter</div>
+  <div class="tab" onclick="byttTab('metrix',this)">🏆 Resultater</div>
   <div class="tab" onclick="byttTab('komp',this)">🗓️ Konkurranser</div>
   <div class="tab" onclick="byttTab('turn',this)">🏅 Turneringer</div>
 </div>
 
+<!-- FAVORITTER -->
+<div id="side-fav" class="side aktiv">
+  <div class="sokk">
+    <div class="sokk-tittel">Legg til konkurranse</div>
+    <div class="rad">
+      <input type="number" id="fav-input" placeholder="Konkurranse-ID..." inputmode="numeric">
+      <button onclick="leggTilFav()">+ Legg til</button>
+    </div>
+    <div style="font-size:12px;color:var(--dim);margin-top:4px">
+      Lim inn ID fra Metrix-lenken, f.eks. discgolfmetrix.com/<strong style="color:var(--text)">3554617</strong>
+    </div>
+  </div>
+  <div class="feil" id="fav-feil"></div>
+  <div class="ldr" id="fav-ldr"><div class="spinner"></div>Henter konkurranse...</div>
+  <div id="fav-liste"></div>
+</div>
+
 <!-- RESULTATER -->
-<div id="side-metrix" class="side aktiv">
+<div id="side-metrix" class="side">
   <div class="sokk">
     <div class="sokk-tittel">Hent konkurranse</div>
     <div class="rad">
@@ -188,6 +214,74 @@ function byttTab(navn,el){
   document.getElementById('side-'+navn).classList.add('aktiv');
 }
 
+// ── FAVORITTER ──────────────────────────────────────────────────────────────
+function getFavoritter(){
+  try { return JSON.parse(localStorage.getItem('fav')||'[]'); }
+  catch(e){ return []; }
+}
+function lagreFavoritter(fav){ localStorage.setItem('fav', JSON.stringify(fav)); }
+
+async function leggTilFav(){
+  const id = document.getElementById('fav-input').value.trim();
+  if(!id){ visFeil('fav-feil','Skriv inn en ID'); return; }
+  skj('fav-feil');
+  vis('fav-ldr');
+  try{
+    const r = await fetch('/api/metrix/'+id);
+    const data = await r.json();
+    skj('fav-ldr');
+    if(!data.Competition||!data.Competition.ID){ visFeil('fav-feil','Fant ingen konkurranse med ID '+id); return; }
+    const c = data.Competition;
+    const fav = getFavoritter();
+    if(fav.find(f=>f.id===id)){ visFeil('fav-feil','Denne er allerede i favoritter'); return; }
+    fav.unshift({ id, navn: rens(c.Name), bane: rens(c.CourseName), dato: c.Date });
+    lagreFavoritter(fav);
+    document.getElementById('fav-input').value = '';
+    visFavListe();
+  }catch(e){
+    skj('fav-ldr');
+    visFeil('fav-feil','Kunne ikke hente konkurranse. Sjekk ID-en.');
+  }
+}
+
+function slettFav(id){
+  const fav = getFavoritter().filter(f=>f.id!==id);
+  lagreFavoritter(fav);
+  visFavListe();
+}
+
+function visFavListe(){
+  const fav = getFavoritter();
+  const liste = document.getElementById('fav-liste');
+  if(!fav.length){
+    liste.innerHTML=`<div class="tom">
+      Ingen favoritter ennå 🎯<br><br>
+      Legg til konkurranser med ID-en fra Metrix-lenken.<br>
+      <span style="color:var(--acc)">Også private runder som Påske Pargolf!</span>
+    </div>`;
+    return;
+  }
+  liste.innerHTML = fav.map(f=>`
+    <div class="fav-kort">
+      <div class="fav-info" onclick="apneFav('${f.id}')">
+        <div class="fav-navn">${esc(f.navn)}</div>
+        <div class="fav-meta">📍 ${esc(f.bane||'')} &nbsp;·&nbsp; 🗓 ${esc(f.dato||'')}</div>
+      </div>
+      <button class="fav-slett" onclick="slettFav('${f.id}')" title="Fjern">✕</button>
+    </div>
+  `).join('');
+}
+
+function apneFav(id){
+  // Bytt til resultater-fane og hent
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('aktiv'));
+  document.querySelectorAll('.side').forEach(s=>s.classList.remove('aktiv'));
+  document.querySelectorAll('.tab')[1].classList.add('aktiv');
+  document.getElementById('side-metrix').classList.add('aktiv');
+  document.getElementById('m-id').value = id;
+  hentMetrix();
+}
+
 // ── KONKURRANSER ────────────────────────────────────────────────────────────
 async function hentKomp(fylke, el){
   document.querySelectorAll('#k-grid .chip').forEach(c=>c.classList.remove('aktiv'));
@@ -201,7 +295,7 @@ async function hentKomp(fylke, el){
     skj('k-ldr');
     const liste = data.konkurranser||[];
     if(!liste.length){
-      document.getElementById('k-res').innerHTML=`<div style="text-align:center;padding:30px;color:var(--dim)">Ingen konkurranser funnet i ${esc(fylke)}</div>`;
+      document.getElementById('k-res').innerHTML=`<div class="tom">Ingen offentlige konkurranser funnet i ${esc(fylke)}<br><br>Tips: Legg til private runder i ⭐ Favoritter</div>`;
       return;
     }
     document.getElementById('k-res').innerHTML=`
@@ -216,8 +310,7 @@ async function hentKomp(fylke, el){
       `).join('')}`;
   }catch(e){
     skj('k-ldr');
-    document.getElementById('k-feil').textContent='Kunne ikke hente konkurranser.';
-    vis('k-feil');
+    visFeil('k-feil','Kunne ikke hente konkurranser.');
   }
 }
 
@@ -295,6 +388,10 @@ function toggleLive(){
 
 function visFeil(id,msg){const el=document.getElementById(id);el.textContent=msg;el.classList.add('vis')}
 document.getElementById('m-id').addEventListener('keydown',e=>{if(e.key==='Enter')hentMetrix()});
+document.getElementById('fav-input').addEventListener('keydown',e=>{if(e.key==='Enter')leggTilFav()});
+
+// Last favoritter ved oppstart
+visFavListe();
 </script>
 </body>
 </html>
